@@ -1,4 +1,4 @@
-function sliceshow(img,pos,color,clim,label,figName,vecImg,mri2mni)
+function sliceshow(img,pos,color,clim,label,figName,app,vecImg,mri2mni)
 % sliceshow(img,pos,color,clim,label,figName,vecImg,mri2mni)
 %
 % sliceshow displays a 3D volume allowing the user to click on different
@@ -26,26 +26,27 @@ function sliceshow(img,pos,color,clim,label,figName,vecImg,mri2mni)
 % (c) June 29, 2018, Yu (Andy) Huang
 % (c) August 2019, Yu (Andy) Huang
 
-if nargin<1 || isempty(img)
+nargin
+if nargin<2 || isempty(img)
     error('At least give us a volume to display')
 else
     [Nx,Ny,Nz] = size(img);
     mydata.img = img;
 end
 
-if nargin<2 || isempty(pos)
+if nargin<3 || isempty(pos)
     mydata.pos = round(size(img)/2);
 else
     mydata.pos=pos;
 end
 
-if nargin<3 || isempty(color)
+if nargin<4 || isempty(color)
     mydata.color = 'jet';
 else
     mydata.color = color;
 end
 
-if nargin<4 || isempty(clim)
+if nargin<5 || isempty(clim)
     if all(isnan(img(:)))
         error('The image volume you provided does not have any meaningful values.');
     elseif double(min(img(:)))==double(max(img(:)))
@@ -57,13 +58,13 @@ else
     mydata.clim = clim;
 end
 
-if nargin<5 || isempty(label)
+if nargin<6 || isempty(label)
     mydata.label=[];
 else
     mydata.label=label;
 end
 
-if nargin<6 || isempty(figName)
+if nargin<7 || isempty(figName)
     figName = '';
 end
 
@@ -88,9 +89,17 @@ else
     mydata.mri2mni = mri2mni;
 end
 
-% link the calback function to new figure
-fh = figure('WindowButtonDownFcn',@myCallback,'Name',figName,'NumberTitle','off');
-
+% GUI mode 
+if app ~= 0
+    app.createFigTab(app); % Create new tab in GUI
+    figAxes = app.MRIViewerTab;
+    
+    fh = figure('WindowButtonDownFcn',@myCallback,'Name',figName,'NumberTitle','off');
+    copyobj(get(fh,'Children'),figAxes);
+else
+    % link the calback function to new figure
+    fh = figure('WindowButtonDownFcn',@myCallback,'Name',figName,'NumberTitle','off');
+end
 % store data as figure property
 set(fh,'UserData',mydata);
 

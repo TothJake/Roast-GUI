@@ -1,4 +1,4 @@
-function start_seg(P,T2,Template,norm)
+function start_seg(P,T2,Template,norm, app)
 % start_seg(P,T2,Template,norm)
 %
 % Gateway script to start running the SPM12 segment function.
@@ -21,19 +21,19 @@ function start_seg(P,T2,Template,norm)
 % Yu (Andy) Huang, 2018.09 adapted to SPM12
 % yhuang16@citymail.cuny.edu
 
-if nargin <1 || isempty(P) %no files
+if nargin <2 || isempty(P) %no files
     P = spm_select(inf,'image','Select images for new segment');
 end
 
-if nargin <2 || isempty(T2) %no T2 specified
+if nargin <3 || isempty(T2) %no T2 specified
     T2 = [];
 end
 
-if nargin <3 || isempty(Template) %no Template
+if nargin <4 || isempty(Template) %no Template
     Template = fullfile(fileparts(which(mfilename)),'eTPM.nii');
 end
 
-if nargin <4 || isempty(norm) %norm not specified... do not normalize data
+if nargin <5 || isempty(norm) %norm not specified... do not normalize data
     norm = false;
 end
 
@@ -62,7 +62,7 @@ for i=1:size(P,1)
     if strcmp(ext,'.hdr'), ref = [dirname filesep baseFilename '.img']; end
     
     t1Data = load_untouch_nii(ref);
-    sliceshow(t1Data.img,[],'gray',[],[],'MRI: Click anywhere to navigate.'); drawnow
+    sliceshow(t1Data.img,[],'gray',[],[],'MRI: Click anywhere to navigate.', app, [], []); drawnow
         
     matlabbatch{1}.spm.spatial.preproc.channel.vols = {ref};  % image to be segmented
     matlabbatch{1}.spm.spatial.preproc.channel.biasreg = 0.001; % P(beta) % 0.0001;
@@ -81,7 +81,7 @@ for i=1:size(P,1)
 %         fprintf('Using %s to segment T1 and T2 images: %s %s\n', Template, ref, ref2);
 
         t2Data = load_untouch_nii(ref2);
-        sliceshow(t2Data.img,[],'gray',[],[],'MRI: T2. Click anywhere to navigate.'); drawnow
+        sliceshow(t2Data.img,[],'gray',[],[],'MRI: T2. Click anywhere to navigate.', app); drawnow
         
         matlabbatch{1}.spm.spatial.preproc.channel(2).vols = {ref2}; % the 2nd image aiding segmentation
         matlabbatch{1}.spm.spatial.preproc.channel(2).biasreg = 0.001; % 0.0001;

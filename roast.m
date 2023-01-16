@@ -57,6 +57,14 @@ function roast(subj,recipe,varargin)
 % yhuang16@citymail.cuny.edu
 % September 2019
 
+if strcmp(varargin{length(varargin)-1}, 'app')
+    disp('Running in GUI mode')
+    guimode = true;
+    app = varargin{length(varargin)};
+    varargin = varargin(1:length(varargin)-2);
+else
+    guimode = false;
+end
 fprintf('\n\n');
 disp('=============================================================')
 disp('ROAST is an aggregated work by Yu (Andy) Huang licensed under')
@@ -780,7 +788,13 @@ if ~strcmp(baseFilename,'nyhead')
         disp('======================================================')
         disp('       STEP 1 (out of 6): SEGMENT THE MRI...          ')
         disp('======================================================')
-        start_seg(subjRasRSPD,T2);
+        if guimode
+            fprintf("--- PRE START_SEG APP --- \n")
+            class(app)
+            start_seg(subjRasRSPD,T2,[], [], app);
+        else
+            start_seg(subjRasRSPD,T2,[], [], 0);
+        end
     else
         disp('======================================================')
         disp('          MRI ALREADY SEGMENTED, SKIP STEP 1          ')
